@@ -29,7 +29,6 @@
     "sonarjs",
     "jsx-a11y",
     "@typescript-eslint",
-    "simple-import-sort",
     "prettier"
   ],
   "env": {
@@ -53,9 +52,6 @@
     "import/prefer-default-export": 0,
     "import/no-anonymous-default-export": 0,
     "import/no-unresolved": 2,
-    "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error",
-    "sort-imports": "off",
     "import/order": "off",
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": "error",
