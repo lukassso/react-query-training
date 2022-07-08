@@ -8,6 +8,7 @@ import { useUser } from '../../user/hooks/useUser';
 import { AppointmentDateMap } from '../types';
 import { getAvailableAppointments } from '../utils';
 import { getMonthYearDetails, getNewMonthYear, MonthYear } from './monthYear';
+import { useQuery } from 'react-query';
 
 // for useQuery call
 async function getAppointments(
@@ -63,14 +64,18 @@ export function useAppointments(): UseAppointments {
   /** ****************** START 3: useQuery  ***************************** */
   // useQuery call for appointments for the current monthYear
 
-  // TODO: update with useQuery!
   // Notes:
   //    1. appointments is an AppointmentDateMap (object with days of month
   //       as properties, and arrays of appointments for that day as values)
   //
   //    2. The getAppointments query function needs monthYear.year and
   //       monthYear.month
-  const appointments = {};
+  const fallback = {};
+
+  const { data: appointments = fallback } = useQuery(
+    queryKeys.appointments,
+    () => getAppointments(monthYear.year, monthYear.month),
+  );
 
   /** ****************** END 3: useQuery  ******************************* */
 
