@@ -6,7 +6,6 @@ import { axiosInstance } from '../../../axiosInstance';
 import { queryKeys } from '../../../react-query/constants';
 import { useUser } from '../../user/hooks/useUser';
 import { AppointmentDateMap } from '../types';
-import { getAvailableAppointments } from '../utils';
 import { getMonthYearDetails, getNewMonthYear, MonthYear } from './monthYear';
 import { useQuery } from 'react-query';
 
@@ -61,19 +60,8 @@ export function useAppointments(): UseAppointments {
   const { user } = useUser();
 
   /** ****************** END 2: filter appointments  ******************** */
-  /** ****************** START 3: useQuery  ***************************** */
-  // useQuery call for appointments for the current monthYear
-
-  // Notes:
-  //    1. appointments is an AppointmentDateMap (object with days of month
-  //       as properties, and arrays of appointments for that day as values)
-  //
-  //    2. The getAppointments query function needs monthYear.year and
-  //       monthYear.month
-  const fallback = {};
-
-  const { data: appointments = fallback } = useQuery(
-    queryKeys.appointments,
+  const { data: appointments = {} } = useQuery(
+    [queryKeys.appointments, monthYear.year, monthYear.month],
     () => getAppointments(monthYear.year, monthYear.month),
   );
 
