@@ -11,11 +11,20 @@ async function getTreatments(): Promise<Treatment[]> {
 }
 
 export function useTreatments(): Treatment[] {
-  const { data = [] } = useQuery(queryKeys.treatments, getTreatments);
+  const { data = [] } = useQuery(queryKeys.treatments, getTreatments, {
+    staleTime: 600000,
+    cacheTime: 900000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
   return data;
 }
 
 export function usePrefetchTreatments(): void {
   const queryClient = useQueryClient();
-  queryClient.prefetchQuery(queryKeys.treatments, getTreatments);
+  queryClient.prefetchQuery(queryKeys.treatments, getTreatments, {
+    staleTime: 600000,
+    cacheTime: 900000,
+  });
 }
