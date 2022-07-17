@@ -25,8 +25,7 @@ type AppointmentMutationFunction = (appointment: Appointment) => void;
 export function useReserveAppointment(): UseMutateFunction<
   void,
   unknown,
-  Appointment,
-  unknown
+  Appointment
 > {
   const { user } = useUser();
   const toast = useCustomToast();
