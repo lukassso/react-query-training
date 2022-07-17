@@ -4,7 +4,7 @@ import { axiosInstance } from '../../../axiosInstance';
 import { queryKeys } from '../../../react-query/constants';
 import { useCustomToast } from '../../app/hooks/useCustomToast';
 import { useUser } from '../../user/hooks/useUser';
-import { useMutation } from 'react-query';
+import { UseMutateFunction, useMutation } from 'react-query';
 
 // for when we need functions for useMutation
 async function setAppointmentUser(
@@ -22,11 +22,16 @@ async function setAppointmentUser(
 // TODO: update type for React Query mutate function
 type AppointmentMutationFunction = (appointment: Appointment) => void;
 
-export function useReserveAppointment(): AppointmentMutationFunction {
+export function useReserveAppointment(): UseMutateFunction<
+  void,
+  unknown,
+  Appointment,
+  unknown
+> {
   const { user } = useUser();
   const toast = useCustomToast();
 
-  const { mutate } = useMutation((appointment) =>
+  const { mutate } = useMutation((appointment: Appointment) =>
     setAppointmentUser(appointment, user?.id),
   );
   return mutate;

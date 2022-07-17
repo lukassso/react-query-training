@@ -99,7 +99,7 @@ export function useAppointments(): UseAppointments {
       refetchOnMount: true,
       refetchOnReconnect: true,
       refetchOnWindowFocus: true,
-      refetchInterval: 1000, // every second: not recommended for production;
+      // refetchInterval: 1000, // every second: not recommended for production;
     },
   );
 
