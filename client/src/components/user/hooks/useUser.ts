@@ -11,12 +11,16 @@ import {
 import { useQuery, useQueryClient } from 'react-query';
 import { useState } from 'react';
 
-async function getUser(user: User | null): Promise<User | null> {
+async function getUser(
+  user: User | null,
+  signal: AbortSignal,
+): Promise<User | null> {
   if (!user) return null;
   const { data }: AxiosResponse<{ user: User }> = await axiosInstance.get(
     `/user/${user.id}`,
     {
       headers: getJWTHeader(user),
+      signal,
     },
   );
   return data.user;
@@ -33,7 +37,7 @@ export function useUser(): UseUser {
   const [user, setUser] = useState<User | null>(getStoredUser());
 
   // call useQuery to update user data from the server
-  useQuery(queryKeys.user, () => getUser(user), {
+  useQuery(queryKeys.user, ({ signal }) => getUser(user, signal), {
     enabled: !!user,
     onSuccess: (data) => setUser(data),
   });

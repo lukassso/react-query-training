@@ -3,8 +3,9 @@ import jsonpatch from 'fast-json-patch';
 import type { User } from '../../../../../shared/types';
 import { axiosInstance, getJWTHeader } from '../../../axiosInstance';
 import { useUser } from './useUser';
-import { UseMutateFunction, useMutation } from 'react-query';
+import { UseMutateFunction, useMutation, useQueryClient } from 'react-query';
 import { useCustomToast } from '../../app/hooks/useCustomToast';
+import { queryKeys } from '../../../react-query/constants';
 
 // for when we need a server function
 async function patchUserOnServer(
@@ -34,10 +35,32 @@ export function usePatchUser(): UseMutateFunction<
 > {
   const { user, updateUser } = useUser();
   const toast = useCustomToast();
+  const queryClient = useQueryClient();
 
   const { mutate: patchUser } = useMutation(
     (newUserData: User) => patchUserOnServer(newUserData, user),
     {
+      // onMutate returned context that is passe to onError
+      onMutate: async (newData: User | null) => {
+        // cancel any outgoing queries for user data, so old server data doesn't overwrite out optimistic update
+        queryClient.cancelQueries(queryKeys.user);
+        //  snapshot of previous user value
+        const previousUserData: User = queryClient.getQueryData(queryKeys.user);
+        //  optimistically updata the cache with new user value
+        updateUser(newData);
+        //  return context object with snapshotted value
+        return { previousUserData };
+      },
+      onError: (error, data, context) => {
+        //  roll back cache to saved value
+        if (context.previousUserData) {
+          updateUser(context.previousUserData);
+          toast({
+            title: 'update failed; restoring previous values',
+            status: 'error',
+          });
+        }
+      },
       onSuccess: (userData: User | null) => {
         if (user) {
           updateUser(userData);
@@ -46,6 +69,10 @@ export function usePatchUser(): UseMutateFunction<
             status: 'success',
           });
         }
+      },
+      onSettled: () => {
+        //  invalidate user query to make sure qw're in sync with the server data
+        queryClient.invalidateQueries(queryKeys.user);
       },
     },
   );
